@@ -868,14 +868,17 @@
 		},
 
 	    do_action: function(id) {
+		console.log("do_action: id="+id);
 		var item = this.$fileList.children().filterAttr('data-id', '' + id);
 		var attr=item.attr;
 		var filename = attr('data-file');
 		// also set on global object for legacy apps
-		window.FileActions.currentFile = this.fileActions.currentFile;
+		window.FileActions.currentFile = item.find('td');
+		console.log("do_action: Querying types; current mime is "+this.$fileList.data('data-mime')+"; parent is "+item.parent());
 		var mime = this.fileActions.getCurrentMimeType();
 		var type = this.fileActions.getCurrentType();
 		var permissions = this.fileActions.getCurrentPermissions();
+		console.log("do_action: mime="+mime+", type="+type+", permissions="+permissions);
 		var action = this.fileActions.getDefault(mime,type, permissions);
 		if(action) {
 		    action(filename, {
@@ -885,6 +888,8 @@
 			dir: attr('data-path') || this.getCurrentDirectory()
 		    });
 		    return true;
+		} else {
+		    console.log("do_action: no action found");
 		}
 		return false;
 	    },
@@ -1479,8 +1484,9 @@
 			// linkUrl
 			if (mime === 'httpd/unix-directory') {
 				linkUrl = this.linkTo(path + '/' + name);
-			}
-			else {
+			} else if (mime === 'application/vnd.oasis.opendocument.text') {
+                                linkUrl = this.linkTo(path + '/' + name) + "&editfile="+fileData.id;
+			} else {
 				linkUrl = this.getDownloadUrl(name, path, type === 'dir');
 			}
 			var linkElem = $('<a></a>').attr({
