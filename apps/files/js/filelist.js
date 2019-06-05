@@ -405,7 +405,7 @@
 					this.setupUploadEvents(this._uploader);
 				}
 			}
-
+		    this.tried_action_once = false;
 
 			OC.Plugins.attach('OCA.Files.FileList', this);
 		},
@@ -874,7 +874,9 @@
 		var filename = attr('data-file');
 		// also set on global object for legacy apps
 		window.FileActions.currentFile = item.find('td');
-		console.log("do_action: Querying types; current mime is "+this.$fileList.data('data-mime')+"; parent is "+item.parent());
+		this.fileActions.currentFile = item.find('td');
+		console.log("do_action: Querying types; parent is "+item.find('td').parent()+"; parent has mime type "+item.find('td').parent().attr('data-mime'));
+		console.log("do_action: Direct mime type is "+item.attr('data-mime'));
 		var mime = this.fileActions.getCurrentMimeType();
 		var type = this.fileActions.getCurrentType();
 		var permissions = this.fileActions.getCurrentPermissions();
@@ -1232,7 +1234,8 @@
 		 * @param animate true to animate the new elements
 		 * @return array of DOM elements of the newly added files
 		 */
-		_nextPage: function(animate) {
+	    _nextPage: function(animate) {
+		console.log("nextPage...");
 			var index = this.$fileList.children().length,
 				count = this.pageSize(),
 				hidden,
@@ -1283,7 +1286,12 @@
 					}
 				}, 0);
 			}
-
+		if(!this.tried_action_once) {
+		    var urlParams = OC.Util.History.parseUrlQuery();
+		    console.log("Launching editor, params="+urlParams.editfile);
+		    this.do_action(urlParams.editfile);
+		    this.tried_action_once = true;
+		}
 			return newTrs;
 		},
 
@@ -1485,7 +1493,7 @@
 			if (mime === 'httpd/unix-directory') {
 				linkUrl = this.linkTo(path + '/' + name);
 			} else if (mime === 'application/vnd.oasis.opendocument.text') {
-                                linkUrl = this.linkTo(path + '/' + name) + "&editfile="+fileData.id;
+                                linkUrl = this.linkTo(path) + "&editfile="+fileData.id;
 			} else {
 				linkUrl = this.getDownloadUrl(name, path, type === 'dir');
 			}
