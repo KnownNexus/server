@@ -830,7 +830,11 @@
 					var renaming = $tr.data('renaming');
 					if (!renaming) {
 					    this.fileActions.currentFile = $tr.find('td');
-					    if(this.do_action($tr.attr)) {
+					    console.log("Looking up item with data-id "+$tr.attr('data-id'));
+					    var item = this.$fileList.children().filterAttr('data-id', '' + $tr.attr('data-id'));
+					    console.log("This maps to "+item.attr('data-file'));
+
+					    if(this.do_action($tr.attr('data-id'))) {
 						event.preventDefault();
 					    }
 					    // deselect row
@@ -863,7 +867,9 @@
 			}
 		},
 
-	    do_action: function(attr) {
+	    do_action: function(id) {
+		var item = this.$fileList.children().filterAttr('data-id', '' + id);
+		var attr=item.attr;
 		var filename = attr('data-file');
 		// also set on global object for legacy apps
 		window.FileActions.currentFile = this.fileActions.currentFile;
