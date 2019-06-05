@@ -829,17 +829,12 @@
 					var filename = $tr.attr('data-file');
 					var renaming = $tr.data('renaming');
 					if (!renaming) {
-						this.fileActions.currentFile = $tr.find('td');
-						var mime = this.fileActions.getCurrentMimeType();
-						var type = this.fileActions.getCurrentType();
-						var permissions = this.fileActions.getCurrentPermissions();
-						var action = this.fileActions.getDefault(mime,type, permissions);
-					    if (action) {
-							event.preventDefault();
-						this.do_action($tr.attr, action);
-						}
-						// deselect row
-						$(event.target).closest('a').blur();
+					    this.fileActions.currentFile = $tr.find('td');
+					    if(this.do_action($tr.attr)) {
+						event.preventDefault();
+					    }
+					    // deselect row
+					    $(event.target).closest('a').blur();
 					}
 				} else {
 					// Even if there is no Details action the default event
@@ -868,20 +863,26 @@
 			}
 		},
 
-	    do_action: function(attr, action) {
+	    do_action: function(attr) {
 		var filename = attr('data-file');
 		// also set on global object for legacy apps
 		window.FileActions.currentFile = this.fileActions.currentFile;
-		action(filename, {
-		    $file: { 'attr': attr },
-		    fileList: this,
-		    fileActions: this.fileActions,
-		    dir: attr('data-path') || this.getCurrentDirectory()
-		});
-
+		var mime = this.fileActions.getCurrentMimeType();
+		var type = this.fileActions.getCurrentType();
+		var permissions = this.fileActions.getCurrentPermissions();
+		var action = this.fileActions.getDefault(mime,type, permissions);
+		if(action) {
+		    action(filename, {
+			$file: { 'attr': attr },
+			fileList: this,
+			fileActions: this.fileActions,
+			dir: attr('data-path') || this.getCurrentDirectory()
+		    });
+		    return true;
+		}
+		return false;
 	    },
 
-	    
 		/**
 		 * Event handler for when clicking on a file's checkbox
 		 */
