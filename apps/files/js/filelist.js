@@ -884,7 +884,7 @@
 		var action = this.fileActions.getDefault(mime,type, permissions);
 		if(action) {
 		    action(filename, {
-			$file: { 'attr': attr },
+			$file: item,
 			fileList: this,
 			fileActions: this.fileActions,
 			dir: attr('data-path') || this.getCurrentDirectory()
