@@ -812,7 +812,7 @@
 			if ($tr.hasClass('dragging')) {
 				return;
 			}
-			if (this._allowSelection && (event.ctrlKey || event.shiftKey)) {
+			if (this._allowSelection && (event.shiftKey)) {
 				event.preventDefault();
 				if (event.shiftKey) {
 					this._selectRange($tr);
@@ -821,6 +821,8 @@
 				}
 				this._lastChecked = $tr;
 				this.updateSelectionSummary();
+			} else if (this._allowSelection && (event.ctrlKey)) {
+			    console.log("Ctrl-click on file; doing nothing so allowing browser default");
 			} else {
 				// clicked directly on the name
 				if (!this._detailsView || $(event.target).is('.nametext, .name') || $(event.target).closest('.nametext').length) {
@@ -832,16 +834,9 @@
 						var type = this.fileActions.getCurrentType();
 						var permissions = this.fileActions.getCurrentPermissions();
 						var action = this.fileActions.getDefault(mime,type, permissions);
-						if (action) {
+					    if (action) {
 							event.preventDefault();
-							// also set on global object for legacy apps
-							window.FileActions.currentFile = this.fileActions.currentFile;
-							action(filename, {
-								$file: $tr,
-								fileList: this,
-								fileActions: this.fileActions,
-								dir: $tr.attr('data-path') || this.getCurrentDirectory()
-							});
+						this.do_action($tr.attr, action);
 						}
 						// deselect row
 						$(event.target).closest('a').blur();
@@ -873,6 +868,20 @@
 			}
 		},
 
+	    do_action: function(attr, action) {
+		var filename = attr('data-file');
+		// also set on global object for legacy apps
+		window.FileActions.currentFile = this.fileActions.currentFile;
+		action(filename, {
+		    $file: { 'attr': attr },
+		    fileList: this,
+		    fileActions: this.fileActions,
+		    dir: attr('data-path') || this.getCurrentDirectory()
+		});
+
+	    },
+
+	    
 		/**
 		 * Event handler for when clicking on a file's checkbox
 		 */
