@@ -834,9 +834,12 @@
 					    var item = this.$fileList.children().filterAttr('data-id', '' + $tr.attr('data-id'));
 					    console.log("This maps to "+item.attr('data-file'));
 
-					    if(this.do_action($tr.attr('data-id'))) {
-						event.preventDefault();
-					    }
+					    var path = /&(.+)/.exec(window.location.href)[1];
+					    var url = window.location.href.replace(path, "editfile=" + $tr.attr('data-id'));
+					    window.open(url ,"_blank");
+
+					    event.preventDefault();
+
 					    // deselect row
 					    $(event.target).closest('a').blur();
 					}
